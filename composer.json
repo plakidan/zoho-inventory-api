@@ -1,6 +1,6 @@
 {
   "name": "plakidan/zoho-inventory-api",
-  "description": "SDK for ZOHO Inventory API with O'Auth2.0 support",
+  "description": "PHP SDK for ZOHO Inventory API with O'Auth2.0 support",
   "homepage": "https://www.zoho.com/inventory/api/v1/",
   "keywords": [
     "php",
