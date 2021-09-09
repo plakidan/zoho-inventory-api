@@ -1,13 +1,14 @@
 {
-  "name": "shqear/zoho-inventory-api",
-  "description": "SDK for ZOHO Inventory API.",
+  "name": "plakidan/zoho-inventory-api",
+  "description": "SDK for ZOHO Inventory API with O'Auth2.0 support",
   "homepage": "https://www.zoho.com/inventory/api/v1/",
   "keywords": [
     "php",
     "zoho",
     "api",
     "inventory",
-    "SDK"
+    "SDK",
+    "OAuth"
   ],
   "type": "library",
   "license": "Apache-2.0",
@@ -16,6 +17,11 @@
       "name": "Khaled AbuShqear",
       "email": "qmax93@gmail.com",
       "homepage": "https://fb.com/shqear"
+    },
+    {
+      "name": "Yaroslav Plakyda",
+      "email": "plakidan@gmail.com",
+      "homepage": "https://fb.com/kukuruser"
     }
   ],
   "minimum-stability": "dev",
@@ -26,7 +32,7 @@
   },
   "autoload": {
     "psr-4": {
-      "shqear\\lib\\": "src/"
+      "plakidan\\Zoho\\Inventory\\": "src/"
     }
   }
 }
