@@ -1,11 +1,22 @@
 <?php
 
-namespace shqear\lib;
+/**
+ * Author: Stierlitz
+ * Email: plakida@gmail.com
+ * License: GNU General Public License v3.0
+ */
 
-class ZohoClient
+namespace Plakidan\Zoho\Inventory;
+
+class Client
 {
     public $organizationId;
     public $accessToken;
+    public $refreshToken;
+    public $clientId;
+    public $clientSecret;
+    public $redirectUri;
+    private $regenerated = false;
 
     public $returnAsJson = true; // planned to determine function return format (Json/Boolean)
 
@@ -39,8 +50,17 @@ class ZohoClient
      */
     public function __construct(array $config = [])
     {
-        if (!isset($config['accessToken'])) {
-            throw new \Exception('You have to set \'accessToken\' to use zoho client');
+        $req = [
+            'accessToken',
+            'refreshToken',
+            'clientId',
+            'clientSecret',
+            'redirectUri',
+        ];
+        foreach ($req as $item){
+            if (!isset($config[$item])) {
+                throw new \Exception('You have to set \''.$item.'\' to use zoho client');
+            }
         }
         foreach ($config as $property => $value) {
             $this->{$property} = $value;
@@ -706,7 +726,7 @@ class ZohoClient
      */
     public function getAuthParams()
     {
-        return array_merge(['authtoken' => $this->accessToken, 'organization_id' => $this->organizationId]);
+        return ['organization_id' => $this->organizationId];
     }
 
     //------------------------------ Execution Functions --------------------------
@@ -739,6 +759,7 @@ class ZohoClient
             curl_setopt($this->_curlObject, CURLOPT_URL, $this->getUrlPath($alias, $urlParams));
             curl_setopt($this->_curlObject, CURLOPT_POSTFIELDS, $params);
         }
+        curl_setopt($this->_curlObject,CURLOPT_HTTPHEADER,['Authorization: Bearer '.$this->accessToken]);
         return $this->execute();
     }
 
@@ -764,9 +785,41 @@ class ZohoClient
         curl_close($this->_curlObject);
         $return = json_decode($return);
         if ($return->code == 0) {
+            $this->regenerated = false;
             return $return;
         } else {
+            if($return->code == 14 && $return->message == 'Invalid value passed for authtoken.' && !$this->regenerated){
+                $this->regenerateAccessToken();
+                $this->execute();
+            }
             throw new \Exception("Zoho Error ({$return->code}) : {$return->message}.");
+        }
+    }
+
+    private function regenerateAccessToken(){
+        $this->regenerated = true;
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://accounts.zoho.com/oauth/v2/token?'.http_build_query([
+                    'refresh_token' => $this->refreshToken,
+                    'client_id' => $this->clientId,
+                    'client_secret' => $this->clientSecret,
+                    'redirect_uri' => $this->redirectUri,
+                    'grant_type' => 'refresh_token'
+                ]),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+        ));
+        $response = curl_exec($curl);
+        curl_close($curl);
+        $response = json_decode($response,true);
+        if($response && isset($response['access_token'])){
+            $this->accessToken = $response['access_token'];
         }
     }
 }
