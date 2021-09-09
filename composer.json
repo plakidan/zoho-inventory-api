@@ -32,6 +32,7 @@
     }
   ],
   "require": {
+    "plakidan/zoho-inventory-api": "master",
     "php": ">=5.6",
     "ext-json": "*",
     "ext-curl": "*"
