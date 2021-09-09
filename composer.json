@@ -17,11 +17,6 @@
       "name": "Yaroslav Plakyda",
       "email": "plakidan@gmail.com",
       "homepage": "https://fb.com/kukuruser"
-    },
-    {
-      "name": "Khaled AbuShqear",
-      "email": "qmax93@gmail.com",
-      "homepage": "https://fb.com/shqear"
     }
   ],
   "minimum-stability": "dev",
